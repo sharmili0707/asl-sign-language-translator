@@ -12,8 +12,10 @@ mp_hands = mp.solutions.hands
 hands = mp_hands.Hands()
 mp_draw = mp.solutions.drawing_utils
 
-run = st.checkbox("Start Camera")
 FRAME_WINDOW = st.image([])
+run = st.checkbox("Start Camera")
+
+cap = cv2.VideoCapture(0)
 
 def extract_landmarks(hand_landmarks):
     data = []
@@ -21,14 +23,8 @@ def extract_landmarks(hand_landmarks):
         data.extend([lm.x, lm.y, lm.z])
     return np.array(data).reshape(1, -1)
 
-cap = cv2.VideoCapture(0)
-
-while run:
+if run:
     ret, frame = cap.read()
-    if not ret:
-        st.write("Camera not working")
-        break
-
     frame = cv2.flip(frame, 1)
     rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     result = hands.process(rgb)
@@ -39,6 +35,9 @@ while run:
 
             landmarks = extract_landmarks(handLms)
             prediction = model.predict(landmarks)
-            st.text(f"Predicted Sign: {prediction[0]}")
 
-    FRAME_WINDOW.image(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
+            st.success(f"Predicted Sign: {prediction[0]}")
+
+    FRAME_WINDOW.image(rgb)
+
+cap.release()
