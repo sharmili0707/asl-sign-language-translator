@@ -2,11 +2,11 @@ import streamlit as st
 import cv2
 import mediapipe as mp
 import numpy as np
-from tensorflow.keras.models import load_model
+import joblib
 
 st.title("🤟 ASL Sign Language Translator")
 
-model = load_model("sign_model.h5")
+model = joblib.load("asl_model.pkl")
 
 mp_hands = mp.solutions.hands
 hands = mp_hands.Hands()
@@ -39,8 +39,6 @@ while run:
 
             landmarks = extract_landmarks(handLms)
             prediction = model.predict(landmarks)
-            class_id = np.argmax(prediction)
-
-            st.text(f"Predicted Sign: {class_id}")
+            st.text(f"Predicted Sign: {prediction[0]}")
 
     FRAME_WINDOW.image(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
